@@ -1,0 +1,209 @@
+@import url('https://api.fontshare.com/v2/css?f[]=hind@400&f[]=poppins@600&display=swap');
+
+/* Fonts */
+:root {
+  --font-primary: 'Poppins', sans-serif;
+  --font-secondary: 'Hind', sans-serif;
+  --font-tertiary: 'Switzer', sans-serif;
+}
+
+/* Light theme (default) */
+:root {
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0 0);
+  --color-base-300: oklch(87% 0 0);
+  --color-base-content: oklch(0% 0 0);
+  --color-primary: oklch(20% 0.042 265.755);
+  --color-primary-content: oklch(93% 0.034 272.788);
+  --color-secondary: oklch(40% 0.01 260); /* A soft gray-blue tone */
+  --color-accent: oklch(77% 0.152 181.912);
+  --color-neutral: oklch(14% 0.005 285.823);
+  --color-info: oklch(74% 0.16 232.661);
+  --color-success: oklch(76% 0.177 163.223);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-error: oklch(71% 0.194 13.428);
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+}
+
+/* Dark theme override */
+[data-theme="dark"] {
+  --color-base-100: oklch(25.33% 0.016 252.42);
+  --color-base-200: oklch(23.26% 0.014 253.1);
+  --color-base-300: oklch(37% 0.013 285.805);
+  --color-base-content: oklch(97.807% 0.029 256.847);
+  --color-primary: oklch(20% 0.042 265.755);
+  --color-primary-content: oklch(96% 0.018 272.314);
+  --color-secondary: oklch(40% 0.01 260);
+  --color-accent: oklch(77% 0.152 181.912);
+  --color-neutral: oklch(14% 0.005 285.823);
+  --color-info: oklch(74% 0.16 232.661);
+  --color-success: oklch(76% 0.177 163.223);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-error: oklch(71% 0.194 13.428);
+}
+
+/* Global base */
+body {
+  font-family: var(--font-secondary);
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Example components */
+.btn {
+  background-color: var(--color-primary);
+  color: var(--color-primary-content);
+  border-radius: var(--radius-box);
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn:hover {
+  background-color: var(--color-secondary);
+}
+
+.card {
+  background-color: var(--color-base-200);
+  border-radius: var(--radius-box);
+  padding: 1rem;
+  color: var(--color-base-content);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+
+/* Now you can toggle light/dark mode with a simple script:
+
+<button onclick="document.body.dataset.theme = (document.body.dataset.theme === 'dark' ? 'light' : 'dark')">
+  Toggle Theme
+</button> */
+
+
+/* =========================================================
+   🌐 GLOBAL RESPONSIVE ADJUSTMENTS
+   Applies to all pages and components site-wide
+   ========================================================= */
+
+/* --- Base responsive font scaling --- */
+html {
+  font-size: clamp(14px, 1.5vw, 16px);
+  scroll-behavior: smooth;
+}
+
+/* --- Make all headings scale smoothly --- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary, 'Poppins', sans-serif);
+  line-height: 1.2;
+  margin-bottom: 0.6rem;
+}
+
+h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); }
+h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+h3 { font-size: clamp(1.2rem, 2.5vw, 1.6rem); }
+p, span, a, li, label, input, button {
+  font-size: clamp(0.85rem, 2vw, 1rem);
+}
+
+/* --- Universal responsive container padding --- */
+.container, .section, .content-area {
+  padding-left: clamp(1rem, 3vw, 2rem);
+  padding-right: clamp(1rem, 3vw, 2rem);
+}
+
+/* --- Responsive images and media --- */
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* --- Buttons global scaling --- */
+button, .btn {
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  padding: clamp(0.5rem, 1.5vw, 0.9rem) clamp(1rem, 3vw, 1.5rem);
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+/* --- Input and form elements --- */
+input, select, textarea {
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  padding: clamp(0.6rem, 1.5vw, 0.9rem) clamp(1rem, 2vw, 1.2rem);
+  border-radius: 8px;
+}
+
+/* =========================================================
+   📱 Breakpoints
+   Fine-tune scaling for smaller viewports
+   ========================================================= */
+
+/* Medium screens (tablets, ≤ 768px) */
+@media (max-width: 768px) {
+  body {
+    font-size: 0.95rem;
+  }
+
+  .card, .modal-content, .login-card {
+    padding: 1.5rem;
+    border-radius: 20px;
+  }
+
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.3rem; }
+  h3 { font-size: 1.1rem; }
+}
+
+/* Small screens (phones, ≤ 576px) */
+@media (max-width: 576px) {
+  body {
+    font-size: 0.9rem;
+  }
+
+  .card, .modal-content, .login-card {
+    max-width: 95%;
+    padding: 1.2rem;
+    border-radius: 18px;
+  }
+
+  button, .btn {
+    font-size: 0.8rem;
+    padding: 0.6rem 1rem;
+  }
+
+  input, select, textarea {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.9rem;
+  }
+
+  h1 { font-size: 1.3rem; }
+  h2 { font-size: 1.1rem; }
+  h3 { font-size: 1rem; }
+  p { font-size: 0.8rem; }
+}
+
+/* Very small screens (≤ 400px) */
+@media (max-width: 400px) {
+  body {
+    font-size: 0.85rem;
+  }
+
+  h1 { font-size: 1.1rem; }
+  h2 { font-size: 1rem; }
+  h3 { font-size: 0.9rem; }
+  p { font-size: 0.75rem; }
+
+  .btn {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.8rem;
+  }
+}
+/* =========================================================
+   🎨 CUSTOM COMPONENT STYLES
+   Specific styles for unique components
+   ========================================================= */
+   
