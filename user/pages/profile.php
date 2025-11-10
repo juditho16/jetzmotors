@@ -15,6 +15,7 @@ $membership = $mStmt->fetch();
 
 <div class="container mt-3">
     <h4><i class="bi bi-person-circle me-2"></i> My Profile</h4>
+    
 
     <div class="card mt-3">
         <div class="card-body">
@@ -44,7 +45,7 @@ $membership = $mStmt->fetch();
 
     <!-- Logout -->
     <div class="mt-3">
-        <a href="logout.php" class="btn btn-danger w-100">
+        <a href="loading.php" class="btn btn-danger w-100">
             <i class="bi bi-box-arrow-right"></i> Logout
         </a>
     </div>
