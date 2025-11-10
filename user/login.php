@@ -35,16 +35,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         body {
             background: var(--color-base-100);
             overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
         }
 
+        /* ✅ Container */
         .login-container {
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100vh;
             padding: 1rem;
+            position: relative;
+            top: -40px; /* moves card slightly above center on desktop */
         }
 
+        /* ✅ Card */
         .login-card {
             background: #fff;
             border-radius: 25px;
@@ -54,13 +60,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             max-width: 380px;
             text-align: center;
             position: relative;
-            z-index: 1;
-            margin-bottom: -60px;
+            z-index: 2;
         }
 
+        /* ✅ Centered GIF */
         .login-card img.work-gif {
             width: 110px;
-            margin-bottom: 1rem;
+            margin: 0 auto 1rem auto;
+            display: block;
         }
 
         .login-card h2 {
@@ -81,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 0.7rem 1rem;
             background-color: var(--color-base-200);
             border: none;
+            font-size: 0.9rem;
         }
 
         .btn-primary {
@@ -97,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: var(--color-secondary);
         }
 
+        /* ✅ Footer Wave */
         .svg-footer-wrapper {
             position: absolute;
             bottom: 0;
@@ -104,6 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 100%;
             height: 200px;
             overflow: hidden;
+            z-index: 1;
         }
 
         .svg-footer-wrapper svg {
@@ -125,6 +135,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-family: var(--font-secondary);
             font-size: 0.8rem;
             margin: 0;
+        }
+
+        /* ✅ Mobile View Adjustments */
+        @media (max-width: 768px) {
+            .login-container {
+                top: -60px; /* move higher on mobile */
+            }
+
+            .login-card {
+                max-width: 300px;
+                padding: 1.5rem;
+                border-radius: 20px;
+            }
+
+            .login-card img.work-gif {
+                width: 85px;
+                margin-bottom: 0.8rem;
+            }
+
+            .login-card h2 {
+                font-size: 1.1rem;
+            }
+
+            .login-card p {
+                font-size: 0.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .form-control {
+                padding: 0.6rem 0.9rem;
+                font-size: 0.8rem;
+            }
+
+            .btn-primary {
+                font-size: 0.8rem;
+                padding: 0.6rem;
+            }
+
+            .footer-overlay-login p {
+                font-size: 0.75rem;
+            }
+
+            .svg-footer-wrapper {
+                height: 160px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                top: -50px;
+            }
+
+            .login-card {
+                max-width: 260px;
+                padding: 1.2rem;
+            }
+
+            .login-card img.work-gif {
+                width: 75px;
+            }
+
+            .login-card h2 {
+                font-size: 1rem;
+            }
+
+            .login-card p {
+                font-size: 0.7rem;
+            }
+
+            .form-control {
+                padding: 0.55rem 0.8rem;
+                font-size: 0.75rem;
+            }
+
+            .btn-primary {
+                font-size: 0.75rem;
+                padding: 0.55rem;
+            }
+
+            .svg-footer-wrapper {
+                height: 150px;
+            }
         }
     </style>
 </head>
@@ -150,10 +242,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button class="btn btn-primary w-100 mb-3">Sign In</button>
             </form>
 
-            <p><a href="forgot_password.php" class="text-decoration-none" style="color: var(--color-primary);">Forgot Password?</a></p>
-            <p class="mt-2" style="font-size: 0.9rem;">Don’t have an account? 
-                <a href="signup.php" class="fw-semibold text-decoration-none" style="color: var(--color-secondary);">Sign Up</a>
-            </p>
+            <p>
+  <a href="pages/auth/forgot_password.php"
+     class="text-decoration-none"
+     style="color: var(--color-primary);">
+     Forgot Password?
+  </a>
+</p>
+
+<p class="mt-2" style="font-size: 0.9rem;">
+  Don’t have an account?
+  <a href="signup.php"
+     class="fw-semibold text-decoration-none"
+     style="color: var(--color-secondary);">
+     Sign Up
+  </a>
+</p>
+
         </div>
     </div>
 

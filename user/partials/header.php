@@ -1,96 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Jetz Motors User</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ responsive -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: "Segoe UI", sans-serif;
-            background: #f8f9fa;
-            margin: 0;
-            padding-bottom: 60px;
-            /* space for bottom nav */
-        }
+  <meta charset="UTF-8">
+  <title>Jetz Motors User</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        header {
-            background: #1e293b;
-            color: white;
-            text-align: center;
-            padding: 1rem;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
+  <!-- Bootstrap + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/app.css">
 
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #1e293b;
-            display: flex;
-            justify-content: space-around;
-            padding: 0.5rem 0;
-            border-top: 1px solid #334155;
-        }
+  <style>
+    /* HEADER BASE */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 1.2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background-color: var(--color-base-100);
+      color: var(--color-base-content);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
 
-        .bottom-nav a {
-            color: #cbd5e1;
-            text-decoration: none;
-            text-align: center;
-            flex: 1;
-            font-size: 0.9rem;
-        }
+    [data-theme="dark"] header {
+      background-color: var(--color-primary);
+      color: var(--color-primary-content);
+    }
 
-        .bottom-nav a.active {
-            color: #0d6efd;
-        }
+    /* BRAND */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-primary);
+      font-weight: 600;
+      font-size: 1rem;
+      white-space: nowrap;
+    }
 
-        .bottom-nav i {
-            display: block;
-            font-size: 1.3rem;
-        }
-    </style>
+    .brand img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      transition: filter 0.3s ease;
+      filter: brightness(70%) saturate(120%);
+    }
+
+    [data-theme="dark"] .brand img {
+      filter: grayscale(100%) brightness(100%) contrast(150%) invert(1);
+    }
+
+    /* HEADER ACTIONS */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-actions button {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-size: 1.4rem;
+      position: relative;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .header-actions button:hover {
+      color: var(--color-accent);
+    }
+
+    /* Notification Badge - clean, no pulse */
+    .notif-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: var(--color-error);
+      color: var(--color-primary-content);
+      border-radius: 50%;
+      font-size: 0.6rem;
+      padding: 3px 5px;
+      font-weight: 600;
+      box-shadow: 0 0 6px rgba(255, 0, 0, 0.5);
+    }
+
+    /* DESKTOP NAV (RIGHT SIDE) */
+    .desktop-nav {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .desktop-nav {
+        display: flex;
+        align-items: center;
+        gap: 1.4rem;
+        margin-left: auto;
+        margin-right: 2rem;
+      }
+
+      .desktop-nav a {
+        color: inherit;
+        text-decoration: none;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: color 0.3s ease;
+      }
+
+      .desktop-nav a:hover {
+        color: var(--color-accent);
+      }
+    }
+
+    /* MOBILE BOTTOM NAV - FIXED CLEAN VERSION */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--color-base-100);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0.7rem 0;
+      box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.08);
+      z-index: 999;
+      transition: background-color 0.3s ease;
+    }
+
+    [data-theme="dark"] .bottom-nav {
+      background: var(--color-primary);
+    }
+
+    .bottom-nav a {
+      flex: 1;
+      text-align: center;
+      text-decoration: none;
+      color: var(--color-primary);
+      transition: color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    [data-theme="dark"] .bottom-nav a {
+      color: var(--color-primary-content);
+    }
+
+    .bottom-nav a.active i {
+      color: var(--color-accent);
+      transform: translateY(-3px);
+    }
+
+    .bottom-nav i {
+      font-size: 1.8rem;
+      display: block;
+      font-weight: 900;
+      transition: all 0.3s ease;
+    }
+
+    .bottom-nav a:hover i {
+      transform: translateY(-3px);
+    }
+
+    /* ✅ Hide labels on small screens */
+    .bottom-nav span {
+      display: inline-block;
+      font-size: 0.8rem;
+      margin-top: 3px;
+    }
+
+    @media (max-width: 768px) {
+      .bottom-nav span {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .bottom-nav {
+        display: none;
+      }
+    }
+
+    /* CONTENT AREA FIXES */
+    main.container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      main.container {
+        padding-bottom: 90px; /* space for bottom nav */
+        padding-top: 1.2rem; /* reduced top gap */
+      }
+
+      .card {
+        margin: 0 auto;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        border: none;
+      }
+    }
+
+  </style>
 </head>
 
 <body>
-    <div class="d-flex justify-content-between align-items-center p-3 bg-dark text-white">
-        <!-- Brand -->
-        <h5 class="m-0">🏍️ Jetz Motors</h5>
-
-        <!-- Mobile Bell -->
-        <button class="btn btn-dark position-relative d-md-none" data-bs-toggle="modal"
-            data-bs-target="#notificationModal">
-            <i class="bi bi-bell fs-5"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                3
-            </span>
-        </button>
-
-        <!-- Desktop Navigation -->
-        <div class="d-none d-md-flex align-items-center gap-3">
-            <a href="index.php?page=appointments" class="text-white text-decoration-none">
-                <i class="bi bi-calendar-event me-1"></i> Book
-            </a>
-            <a href="index.php?page=purchases" class="text-white text-decoration-none">
-                <i class="bi bi-receipt me-1"></i> Purchases
-            </a>
-            <a href="index.php?page=history" class="text-white text-decoration-none">
-                <i class="bi bi-clock-history me-1"></i> History
-            </a>
-            <a href="index.php?page=profile" class="text-white text-decoration-none">
-                <i class="bi bi-person me-1"></i> Profile
-            </a>
-            <!-- Desktop Notification Bell -->
-            <button class="btn btn-dark position-relative p-0" data-bs-toggle="modal"
-                data-bs-target="#notificationModal">
-                <i class="bi bi-bell fs-5"></i>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    3
-                </span>
-            </button>
-        </div>
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <img src="../assets/components/gear2.gif" alt="Jetz Motors">
+      <span>
+        <?php
+          echo isset($_SESSION['user_name'])
+              ? 'Welcome, ' . htmlspecialchars(explode(' ', $_SESSION['user_name'])[0])
+              : 'Welcome, User';
+        ?>
+      </span>
     </div>
+
+    <nav class="desktop-nav">
+      <a href="index.php?page=appointments"><i class="bi bi-calendar-event"></i> Book</a>
+      <a href="index.php?page=purchase"><i class="bi bi-receipt"></i> Purchases</a>
+      <a href="index.php?page=history"><i class="bi bi-clock-history"></i> History</a>
+      <a href="index.php?page=profile"><i class="bi bi-person"></i> Profile</a>
+    </nav>
+
+    <div class="header-actions">
+      <button type="button" data-bs-toggle="modal" data-bs-target="#notificationModal">
+        <i class="bi bi-bell"></i>
+        <span class="notif-badge">3</span>
+      </button>
+      <button id="themeToggle" title="Toggle Dark Mode">
+        <i class="bi bi-moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- MOBILE NAV -->
+  <nav class="bottom-nav">
+    <a href="index.php?page=profile" class="active"><i class="bi bi-person"></i></a>
+    <a href="index.php?page=history"><i class="bi bi-clock-history"></i></a>
+    <a href="index.php?page=appointments"><i class="bi bi-calendar-event"></i></a>
+    <a href="index.php?page=purchase"><i class="bi bi-receipt"></i></a>
+  </nav>
+
+  <!-- MODAL -->
+  <div class="modal fade" id="notificationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <h5 class="mb-2">Notifications</h5>
+        <p>No new notifications.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const toggleBtn = document.getElementById("themeToggle");
+    const icon = toggleBtn.querySelector("i");
+
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.dataset.theme = "dark";
+      icon.classList.replace("bi-moon", "bi-sun");
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      if (document.body.dataset.theme === "dark") {
+        document.body.dataset.theme = "";
+        localStorage.setItem("theme", "light");
+        icon.classList.replace("bi-sun", "bi-moon");
+      } else {
+        document.body.dataset.theme = "dark";
+        localStorage.setItem("theme", "dark");
+        icon.classList.replace("bi-moon", "bi-sun");
+      }
+    });
+  </script>
+</body>
+</html>

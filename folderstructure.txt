@@ -1,0 +1,43 @@
+/user/
+ │
+ ├── partials/
+ │   ├── header.php       ← has opening HTML and <body>, not closed yet
+ │   └── navbar.php       ← closes main and adds bottom nav
+ │
+ ├── pages/
+ │    ├── profile.php       ← has opening HTML and <body>, not closed yet
+ │    ├── appointments.php       ← closes main and adds bottom nav
+ │    ├── history.php       ← closes main and adds bottom nav
+ │    ├── purchase.php       ← closes main and adds bottom nav
+ │    └── auth/
+ │         ├── forgot_password.php
+ │         ├── verify_otp.php
+ │         └── reset_password.php
+ |
+ ├── signup.php  ← register page
+ ├── index.php ← main dashboard (after login)
+ ├── loading.php ← main dashboard (after login)
+ ├── login.php ← log dashboard (after login)
+ ├── logout.php ← logout dashboard (after login)
+ ├── config/ 
+ │    └── db.php
+ ├── lib/
+ │    └── functions.php
+ └── assets/
+      └── components/work.gif
+
+
+
+
+user/
+│
+├── index.php
+│
+├── partials/
+│   ├── header.php       ← has opening HTML and <body>, not closed yet
+│   └── navbar.php       ← closes main and adds bottom nav
+│
+└── pages/
+    ├── profile.php
+    ├── appointments.php  ← the one you showed
+    └── history.php
