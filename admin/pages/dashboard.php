@@ -1,155 +1,313 @@
 <?php
-// /admin/pages/dashboard.php
+require_once "../config/db.php";
+require_once "../lib/functions.php";
 
-// Total users
-$totalUsers = $pdo->query("SELECT COUNT(*) AS c FROM users")->fetch()['c'] ?? 0;
-
-// Total active members
-$totalMembers = $pdo->query("SELECT COUNT(*) AS c FROM users WHERE is_member=1 AND (member_until IS NULL OR member_until >= CURDATE())")->fetch()['c'] ?? 0;
-
-// Today's appointments
-$todayAppointments = $pdo->prepare("SELECT COUNT(*) AS c FROM appointments WHERE DATE(schedule_at)=CURDATE()");
-$todayAppointments->execute();
-$todayAppointments = $todayAppointments->fetch()['c'] ?? 0;
-
-// Revenue today
-$todayRevenue = $pdo->prepare("SELECT SUM(total) AS total FROM invoices WHERE DATE(created_at)=CURDATE()");
-$todayRevenue->execute();
-$todayRevenue = $todayRevenue->fetch()['total'] ?? 0;
-
-// Recent appointments
-$recentAppointments = $pdo->query("
-  SELECT a.id, u.name AS customer, s.name AS service, a.status, a.schedule_at 
-  FROM appointments a
-  JOIN users u ON a.user_id=u.id
-  JOIN services s ON a.service_id=s.id
-  ORDER BY a.created_at DESC
-  LIMIT 5
-")->fetchAll();
+// Mock data (replace with DB later)
+$totalSales = 325000.50;
+$totalOrders = 154;
+$totalCustomers = 87;
+$topProduct = "Yamaha Aerox";
 ?>
 
-<div class="container-fluid">
-    <h1 class="mb-4"><i class="bi bi-speedometer2 me-2"></i> Dashboard</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | Jetz Motors Admin</title>
+  <link rel="stylesheet" href="../../assets/css/app.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Quick stats -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card text-bg-primary">
-                <div class="card-body">
-                    <h5 class="card-title">Total Customers</h5>
-                    <p class="card-text fs-3"><?= $totalUsers ?></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-bg-success">
-                <div class="card-body">
-                    <h5 class="card-title">Active Members</h5>
-                    <p class="card-text fs-3"><?= $totalMembers ?></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-bg-warning">
-                <div class="card-body">
-                    <h5 class="card-title">Appointments Today</h5>
-                    <p class="card-text fs-3"><?= $todayAppointments ?></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-bg-danger">
-                <div class="card-body">
-                    <h5 class="card-title">Revenue Today</h5>
-                    <p class="card-text fs-3"><?= fmt_money($todayRevenue ?? 0) ?></p>
-                </div>
-            </div>
-        </div>
+  <style>
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+  }
+
+  .summary-card {
+    background: var(--color-base-200);
+    border-radius: var(--radius-box);
+    padding: 1.5rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+  }
+
+  .summary-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .summary-card h6 {
+    color: var(--color-secondary);
+    font-weight: 500;
+  }
+
+  .summary-card h3 {
+    margin-top: 0.4rem;
+    font-weight: 700;
+    font-family: var(--font-primary);
+  }
+
+  /* === GRID LAYOUT FOR CHARTS === */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 30% 30% 40%;
+    grid-template-rows: auto 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .chart-card {
+    background: var(--color-base-200);
+    border-radius: var(--radius-box);
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    height: 100%;
+  }
+
+  .chart-card h6 {
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+  }
+
+  /* Daily Sales */
+  .daily-sales {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+  }
+
+  /* Booking Schedule Pie Chart */
+  .booking-schedule {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+  }
+
+  /* POS Transactions (Tall Card spanning two rows) */
+  .recent-pos {
+    grid-column: 3 / 4;
+    grid-row: 1 / 3;
+    overflow-y: auto;
+    max-height: 650px;
+  }
+
+  /* Weekly Revenue Comparison (Wide bottom chart) */
+  .weekly-revenue {
+    grid-column: 1 / 3;
+    grid-row: 2 / 3;
+  }
+
+  th {
+    background-color: var(--color-primary);
+    color: var(--color-primary-content);
+  }
+
+  tbody tr:hover {
+    background-color: var(--color-base-300);
+  }
+
+  .status-badge {
+    border-radius: 30px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .status-completed {
+    background: var(--color-success);
+    color: #fff;
+  }
+
+  .status-pending {
+    background: var(--color-warning);
+    color: #000;
+  }
+
+  .status-cancelled {
+    background: var(--color-error);
+    color: #fff;
+  }
+
+  @media (max-width: 992px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+    }
+    .recent-pos {
+      grid-row: auto;
+      max-height: none;
+    }
+  }
+  </style>
+</head>
+<body>
+<div class="container-fluid py-4">
+  <div class="page-header">
+    <h3><i class="bi bi-speedometer2 me-2"></i>Dashboard Overview</h3>
+    <button class="btn btn-sm btn-primary"><i class="bi bi-arrow-clockwise me-1"></i> Refresh</button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards mb-4">
+    <div class="summary-card">
+      <h6>Total Sales</h6>
+      <h3>₱<?= number_format($totalSales, 2) ?></h3>
+    </div>
+    <div class="summary-card">
+      <h6>Total Orders</h6>
+      <h3><?= $totalOrders ?></h3>
+    </div>
+    <div class="summary-card">
+      <h6>Total Customers</h6>
+      <h3><?= $totalCustomers ?></h3>
+    </div>
+    <div class="summary-card">
+      <h6>Top Product</h6>
+      <h3><?= $topProduct ?></h3>
+    </div>
+  </div>
+
+  <!-- Analytics Dashboard Grid -->
+  <div class="dashboard-grid">
+    <!-- 1️⃣ Daily Sales Trend -->
+    <div class="chart-card daily-sales">
+      <h6><i class="bi bi-bar-chart-line me-1"></i> Daily Sales Trend</h6>
+      <canvas id="dailySalesChart" height="150"></canvas>
     </div>
 
-    <!-- Recent Appointments -->
-    <div class="card mb-4">
-        <div class="card-header bg-dark text-white">
-            <i class="bi bi-clock-history me-2"></i> Recent Appointments
-        </div>
-        <div class="card-body p-0">
-            <table class="table table-striped mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Customer</th>
-                        <th>Service</th>
-                        <th>Status</th>
-                        <th>Schedule</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if ($recentAppointments): ?>
-                        <?php foreach ($recentAppointments as $a): ?>
-                            <tr>
-                                <td>#<?= $a['id'] ?></td>
-                                <td><?= sanitize($a['customer']) ?></td>
-                                <td><?= sanitize($a['service']) ?></td>
-                                <td>
-                                    <?php
-                                    $badgeClass = match ($a['status']) {
-                                        'Pending' => 'warning',
-                                        'In Progress' => 'info',
-                                        'Completed' => 'success',
-                                        'Cancelled' => 'danger',
-                                        default => 'secondary'
-                                    };
-                                    ?>
-                                    <span class="badge bg-<?= $badgeClass ?>"><?= $a['status'] ?></span>
-                                </td>
-                                <td><?= date("M d, Y h:i A", strtotime($a['schedule_at'])) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="5" class="text-center">No recent appointments.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+    <!-- 2️⃣ Booking Schedule Pie -->
+    <div class="chart-card booking-schedule">
+      <h6><i class="bi bi-pie-chart me-1"></i> Booking Schedule Status</h6>
+      <canvas id="bookingScheduleChart" height="150"></canvas>
     </div>
 
-    <!-- Revenue Chart -->
-    <div class="card">
-        <div class="card-header bg-dark text-white">
-            <i class="bi bi-graph-up-arrow me-2"></i> Weekly Revenue
-        </div>
-        <div class="card-body">
-            <canvas id="revenueChart" height="100"></canvas>
-        </div>
+    <!-- 3️⃣ Recent POS Transactions (Spanning 2 Rows) -->
+    <div class="chart-card recent-pos">
+      <h6><i class="bi bi-receipt me-2"></i> Recent POS Transactions</h6>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Ref No</th>
+              <th>Customer</th>
+              <th>Total</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#TXN-101</td>
+              <td>Juan Dela Cruz</td>
+              <td>₱18,500.00</td>
+              <td><span class="status-badge status-completed">Completed</span></td>
+            </tr>
+            <tr>
+              <td>#TXN-102</td>
+              <td>Maria Santos</td>
+              <td>₱23,900.00</td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+            </tr>
+            <tr>
+              <td>#TXN-103</td>
+              <td>Mark Reyes</td>
+              <td>₱9,850.00</td>
+              <td><span class="status-badge status-completed">Completed</span></td>
+            </tr>
+            <tr>
+              <td>#TXN-104</td>
+              <td>Carlos Diaz</td>
+              <td>₱6,450.00</td>
+              <td><span class="status-badge status-cancelled">Cancelled</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+
+    <!-- 4️⃣ Weekly Revenue Comparison -->
+    <div class="chart-card weekly-revenue">
+      <h6><i class="bi bi-graph-up-arrow me-1"></i> Weekly Revenue Comparison</h6>
+      <canvas id="weeklyRevenueChart" height="150"></canvas>
+    </div>
+  </div>
 </div>
 
-<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: <?= json_encode(
-                array_map(fn($i) => date("D", strtotime("-$i day")), range(6, 0))
-            ) ?>,
-            datasets: [{
-                label: 'Revenue (₱)',
-                data: <?= json_encode(
-                    array_map(function ($i) use ($pdo) {
-                            $stmt = $pdo->prepare("SELECT SUM(total) AS total FROM invoices WHERE DATE(created_at)=?");
-                            $stmt->execute([date("Y-m-d", strtotime("-$i day"))]);
-                            return (float) $stmt->fetch()['total'];
-                        }, range(6, 0))
-                ) ?>,
-                fill: true,
-                borderColor: 'rgb(13,110,253)',
-                backgroundColor: 'rgba(13,110,253,0.3)',
-                tension: 0.3
-            }]
-        }
-    });
+// Daily Sales Bar Chart
+new Chart(document.getElementById('dailySalesChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    datasets: [{
+      label: '₱ Sales',
+      data: [24000, 31000, 28000, 36000, 41000, 47000, 39000],
+      backgroundColor: 'oklch(77% 0.152 181.912)',
+      borderRadius: 6
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true } }
+  }
+});
+
+// Booking Schedule Pie Chart
+new Chart(document.getElementById('bookingScheduleChart'), {
+  type: 'pie',
+  data: {
+    labels: ['Completed', 'Pending', 'Cancelled'],
+    datasets: [{
+      data: [55, 30, 15],
+      backgroundColor: [
+        'oklch(76% 0.177 163.223)',
+        'oklch(82% 0.189 84.429)',
+        'oklch(71% 0.194 13.428)'
+      ]
+    }]
+  },
+  options: {
+    plugins: { legend: { position: 'bottom' } }
+  }
+});
+
+// Weekly Revenue Line Chart
+new Chart(document.getElementById('weeklyRevenueChart'), {
+  type: 'line',
+  data: {
+    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+    datasets: [
+      {
+        label: 'This Month',
+        data: [120000, 145000, 132000, 155000],
+        borderColor: 'oklch(77% 0.152 181.912)',
+        tension: 0.4,
+        fill: false
+      },
+      {
+        label: 'Last Month',
+        data: [100000, 118000, 124000, 135000],
+        borderColor: 'oklch(82% 0.189 84.429)',
+        borderDash: [5,5],
+        tension: 0.4,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    plugins: { legend: { position: 'bottom' } },
+    scales: { y: { beginAtZero: true } }
+  }
+});
 </script>
+</body>
+</html>

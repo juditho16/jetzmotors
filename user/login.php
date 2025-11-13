@@ -11,7 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    if ($user && password_verify($password, $user['password'])) {
+    // 🔹 Accept plain passwords (no hashing)
+    if ($user && $password === $user['password']) {
         $_SESSION['user_logged'] = true;
         $_SESSION['user_id'] = $user['id'];
         header("Location: index.php?page=profile");
