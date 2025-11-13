@@ -29,8 +29,8 @@ function registerUser($pdo, $data)
             return ['status' => 'error', 'message' => 'Email or phone number already registered.'];
         }
 
-        // Hash password and full name
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        // Use plain password (no hashing for debugging)
+        $plainPassword = $password;
         $full_name = trim("$first_name $middle_initial $last_name $suffix");
 
         // Insert new user
@@ -47,7 +47,7 @@ function registerUser($pdo, $data)
             $email,
             $phone,
             $address,
-            $hashedPassword
+            $plainPassword
         ]);
 
         return ['status' => 'success', 'message' => 'Registration successful! Redirecting...'];
