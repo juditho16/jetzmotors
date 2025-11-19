@@ -1,7 +1,7 @@
 <?php
 // /config/db.php
 $DB_HOST = "localhost";     // or "localhost"
-$DB_NAME = "jetzmotors";
+$DB_NAME = "motors";
 $DB_USER = "root";
 $DB_PASS = "";              // default XAMPP = no password
 
