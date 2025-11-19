@@ -203,12 +203,6 @@ transition: transform 0.3s ease;
           <span>Memberships</span>
         </a>
       </li>
-      <li>
-        <a href="index.php?page=reports" class="nav-link <?= active('reports', $current) ?>">
-          <i class="bi bi-graph-up"></i>
-          <span>Reports</span>
-        </a>
-      </li>
     </ul>
   </div>
 

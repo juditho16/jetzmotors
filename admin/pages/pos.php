@@ -47,45 +47,129 @@ $membersStmt = $pdo->query("
 $members = $membersStmt->fetchAll();
 ?>
 
+<style>
+    /* Make cards smaller: 4 per row */
+    .product-card {
+        font-size: 0.78rem;
+        padding: 8px;
+    }
+    .product-card .card-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .product-card p {
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+    }
+
+    /* Small Add button */
+    .btn-add {
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+        height: 26px !important;
+        line-height: 16px;
+    }
+
+    /* 4 cards per row on large screens */
+    @media (min-width: 992px) {
+        .col-4-card {
+            width: 25%;
+        }
+    }
+
+    /* Improve search + sort height */
+    .form-control {
+        height: 38px !important;
+        font-size: 0.9rem !important;
+    }
+    .form-select {
+        height: 38px !important;
+        font-size: 0.9rem !important;
+    }
+    .btn-search {
+        height: 38px !important;
+    }
+
+    .btn-delete {
+    width: 24px !important;
+    height: 24px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+
+    /* Slim checkout + select-member buttons */
+    #checkoutBtn,
+    #selectMemberBtn,
+    .select-member {
+        height: 32px !important;
+        font-size: 0.85rem !important;
+        padding: 5px !important;
+    }
+
+    /* Cart table smaller font */
+    #cartTable td,
+    #cartTable th {
+        font-size: 0.78rem !important;
+    }
+</style>
+
+
 <div class="container-fluid">
-    <h1 class="mb-4"><i class="bi bi-cart4 me-2"></i> Point of Sale</h1>
+    <h1 class="mb-3"><i class="bi bi-cart4 me-2"></i> Point of Sale</h1>
 
     <div class="row">
         <!-- Left: Products -->
         <div class="col-md-8">
-            <form method="GET" action="index.php" class="row mb-3 g-2 align-items-center">
+
+            <form method="GET" action="index.php" class="row mb-2 g-2 align-items-center">
                 <input type="hidden" name="page" value="pos">
+
                 <div class="col-md-8">
-                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" class="form-control"
-                        placeholder="Search by name, SKU, or ID">
+                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" 
+                           class="form-control"
+                           placeholder="Search by name, SKU, or ID">
                 </div>
+
                 <div class="col-md-3">
                     <select name="sort" class="form-select" onchange="this.form.submit()">
-                        <option value="asc" <?= $order === 'asc' ? 'selected' : '' ?>>Sort by Price ↑</option>
-                        <option value="desc" <?= $order === 'desc' ? 'selected' : '' ?>>Sort by Price ↓</option>
+                        <option value="asc" <?= $order === 'asc' ? 'selected' : '' ?>>Price ↑</option>
+                        <option value="desc" <?= $order === 'desc' ? 'selected' : '' ?>>Price ↓</option>
                     </select>
                 </div>
+
                 <div class="col-md-1">
-                    <button class="btn btn-primary w-100"><i class="bi bi-search"></i></button>
+                    <button class="btn btn-primary w-100 btn-search"><i class="bi bi-search"></i></button>
                 </div>
             </form>
 
-            <div class="row g-3">
+            <div class="row g-2">
                 <?php foreach ($products as $p): ?>
-                    <div class="col-md-4">
-                        <div class="card h-100">
+                    <div class="col-4-card col-sm-6 col-md-4 col-lg-3">
+                        <div class="card h-100 product-card">
                             <div class="card-body d-flex flex-column">
-                                <h6 class="card-title mb-2"><?= htmlspecialchars($p['name']) ?></h6>
-                                <p class="mb-1 text-muted">SKU: <?= htmlspecialchars($p['sku']) ?></p>
-                                <p class="fw-bold mb-3">₱<?= number_format($p['unit_price'], 2) ?></p>
-                                <button class="btn btn-sm btn-primary mt-auto add-to-cart" data-id="<?= $p['id'] ?>"
-                                    data-name="<?= htmlspecialchars($p['name']) ?>" data-price="<?= $p['unit_price'] ?>">
+                                <h6 class="card-title"><?= htmlspecialchars($p['name']) ?></h6>
+                                <p class="text-muted">SKU: <?= htmlspecialchars($p['sku']) ?></p>
+                                <p class="fw-bold">₱<?= number_format($p['unit_price'], 2) ?></p>
+
+                                <button class="btn btn-primary btn-add mt-auto add-to-cart"
+                                    data-id="<?= $p['id'] ?>"
+                                    data-name="<?= htmlspecialchars($p['name']) ?>"
+                                    data-price="<?= $p['unit_price'] ?>">
                                     <i class="bi bi-plus-circle"></i> Add
                                 </button>
                             </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
+
                 <?php if (!$products): ?>
                     <p class="text-muted">No products found.</p>
                 <?php endif; ?>
@@ -94,10 +178,11 @@ $members = $membersStmt->fetchAll();
 
         <!-- Right: POS Cart -->
         <div class="col-md-4">
-            <div class="card" style="height: calc(90vh - 90px);">
-                <div class="card-header bg-dark text-white">
+            <div class="card" style="height: calc(90vh - 70px);">
+                <div class="card-header bg-dark text-white py-2">
                     <i class="bi bi-receipt me-2"></i> POS Counter
                 </div>
+
                 <div class="card-body d-flex flex-column">
 
                     <!-- Cart -->
@@ -116,18 +201,18 @@ $members = $membersStmt->fetchAll();
                         </table>
                     </div>
 
-                    <hr>
+                    <hr class="my-2">
 
-                    <!-- Membership Button -->
+                    <!-- Select Member -->
                     <div class="mb-2">
-                        <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal"
-                            data-bs-target="#memberModal">
+                        <button id="selectMemberBtn" type="button" class="btn btn-outline-primary w-100"
+                            data-bs-toggle="modal" data-bs-target="#memberModal">
                             <i class="bi bi-person-vcard me-2"></i> Select Member for Discount
                         </button>
                     </div>
 
                     <!-- Totals -->
-                    <div id="totalsBox">
+                    <div id="totalsBox" style="font-size:0.85rem;">
                         <p class="mb-1 d-none" id="memberRow">
                             <strong>Member:</strong> <span id="memberName"></span>
                         </p>
@@ -135,10 +220,10 @@ $members = $membersStmt->fetchAll();
                         <p class="mb-1 text-success d-none" id="discountRow">
                             <strong>Discount (3%):</strong> -<span id="cartDiscount">₱0.00</span>
                         </p>
-                        <h5>Total Payable: <span id="cartFinal">₱0.00</span></h5>
+                        <h5 style="font-size:1rem;">Total Payable: <span id="cartFinal">₱0.00</span></h5>
                     </div>
 
-                    <button class="btn btn-success w-100 mt-3" id="checkoutBtn">
+                    <button class="btn btn-success w-100 mt-2" id="checkoutBtn">
                         <i class="bi bi-cash-stack"></i> Checkout
                     </button>
                 </div>
@@ -148,16 +233,19 @@ $members = $membersStmt->fetchAll();
 </div>
 
 <!-- Member Modal -->
-<div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true">
+<div class="modal fade" id="memberModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
+
+            <div class="modal-header py-2">
                 <h5 class="modal-title"><i class="bi bi-people me-2"></i> Select Member</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
-                <input type="text" id="memberSearch" class="form-control mb-3"
+                <input type="text" id="memberSearch" class="form-control mb-2"
                     placeholder="Search by Membership ID or name">
+
                 <table class="table table-sm table-hover">
                     <thead>
                         <tr>
@@ -174,10 +262,10 @@ $members = $membersStmt->fetchAll();
                                 <td><?= htmlspecialchars($m['name']) ?></td>
                                 <td><?= htmlspecialchars($m['end_date']) ?></td>
                                 <td>
-                                    <button class="btn btn-sm btn-success select-member"
+                                    <button class="btn btn-success btn-sm select-member"
                                         data-id="<?= $m['membership_id'] ?>"
                                         data-name="<?= htmlspecialchars($m['name']) ?>">
-                                        <i class="bi bi-check-circle"></i> Select
+                                        Select
                                     </button>
                                 </td>
                             </tr>
@@ -185,164 +273,145 @@ $members = $membersStmt->fetchAll();
                     </tbody>
                 </table>
             </div>
+
         </div>
     </div>
 </div>
 
-<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    let cart = [];
-    let selectedMember = null;
+let cart = [];
+let selectedMember = null;
 
-    // Add to Cart
-    function addToCart(id, name, price) {
-        const existing = cart.find(item => item.id === id);
-        if (existing) {
-            existing.qty++;
-            existing.subtotal = existing.qty * existing.price;
-        } else {
-            cart.push({ id, name, price: parseFloat(price), qty: 1, subtotal: parseFloat(price) });
-        }
-        renderCart();
+// Add to Cart
+function addToCart(id, name, price) {
+    const existing = cart.find(item => item.id == id);
+    if (existing) {
+        existing.qty++;
+        existing.subtotal = existing.qty * existing.price;
+    } else {
+        cart.push({ id, name, price: parseFloat(price), qty: 1, subtotal: parseFloat(price) });
     }
+    renderCart();
+}
 
-    document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', () => {
-            addToCart(btn.dataset.id, btn.dataset.name, btn.dataset.price);
-        });
+document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', () => {
+        addToCart(btn.dataset.id, btn.dataset.name, btn.dataset.price);
     });
+});
 
-    // Render cart & totals
-    function renderCart() {
-        const tbody = document.querySelector('#cartTable tbody');
-        tbody.innerHTML = '';
-        let total = 0;
+// Render Cart
+function renderCart() {
+    const tbody = document.querySelector('#cartTable tbody');
+    tbody.innerHTML = '';
+    let total = 0;
 
-        cart.forEach((item, index) => {
-            total += item.subtotal;
-            tbody.innerHTML += `
+    cart.forEach((item, index) => {
+        total += item.subtotal;
+        tbody.innerHTML += `
             <tr>
                 <td>${item.name}</td>
-                <td>
-                    <input type="number" min="1" value="${item.qty}"
-                        class="form-control form-control-sm" style="width:60px"
-                        onchange="updateQty(${index}, this.value)">
-                </td>
+                <td><input type="number" min="1" value="${item.qty}"
+                    class="form-control" style="width:55px"
+                    onchange="updateQty(${index}, this.value)"></td>
                 <td>₱${item.price.toFixed(2)}</td>
                 <td>₱${item.subtotal.toFixed(2)}</td>
-                <td>
-                    <button class="btn btn-sm btn-danger" onclick="removeItem(${index})">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </td>
-            </tr>`;
-        });
+                <td><button class="btn-delete" onclick="removeItem(${index})">X</button> </td></tr>`;
+    });
 
-        const discountRate = selectedMember ? 0.03 : 0;
-        const discount = total * discountRate;
-        const final = total - discount;
+    const discountRate = selectedMember ? 0.03 : 0;
+    const discount = total * discountRate;
+    const final = total - discount;
 
-        document.getElementById('cartTotal').textContent = '₱' + total.toFixed(2);
-        document.getElementById('cartDiscount').textContent = '₱' + discount.toFixed(2);
-        document.getElementById('cartFinal').textContent = '₱' + final.toFixed(2);
-        document.getElementById('discountRow').classList.toggle('d-none', !selectedMember);
+    document.getElementById('cartTotal').textContent = '₱' + total.toFixed(2);
+    document.getElementById('cartDiscount').textContent = '₱' + discount.toFixed(2);
+    document.getElementById('cartFinal').textContent = '₱' + final.toFixed(2);
 
-        // ✅ Toggle member name row
-        if (selectedMember) {
-            document.getElementById('memberRow').classList.remove('d-none');
-            document.getElementById('memberName').textContent =
-                `${selectedMember.name} (ID: ${selectedMember.id})`;
-        } else {
-            document.getElementById('memberRow').classList.add('d-none');
-            document.getElementById('memberName').textContent = '';
-        }
+    document.getElementById('discountRow').classList.toggle('d-none', !selectedMember);
+
+    if (selectedMember) {
+        document.getElementById('memberRow').classList.remove('d-none');
+        document.getElementById('memberName').textContent =
+            `${selectedMember.name} (ID: ${selectedMember.id})`;
+    } else {
+        document.getElementById('memberRow').classList.add('d-none');
     }
+}
 
-    function updateQty(index, qty) {
-        qty = parseInt(qty);
-        if (qty <= 0) qty = 1;
-        cart[index].qty = qty;
-        cart[index].subtotal = cart[index].price * qty;
+function updateQty(index, qty) {
+    qty = parseInt(qty);
+    if (qty <= 0) qty = 1;
+    cart[index].qty = qty;
+    cart[index].subtotal = cart[index].price * qty;
+    renderCart();
+}
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    renderCart();
+}
+
+// Member Selection
+document.querySelectorAll('.select-member').forEach(btn => {
+    btn.addEventListener('click', () => {
+        selectedMember = { id: btn.dataset.id, name: btn.dataset.name };
         renderCart();
+        bootstrap.Modal.getInstance(document.getElementById('memberModal')).hide();
+    });
+});
+
+// Member Search
+document.getElementById('memberSearch').addEventListener('keyup', function () {
+    const term = this.value.toLowerCase();
+    document.querySelectorAll('#memberList tr').forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
+    });
+});
+
+// FAILSAFE CLOSE FOR MODAL
+document.querySelector('#memberModal .btn-close').addEventListener('click', function() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('memberModal'));
+    if (modal) modal.hide();
+});
+
+// Checkout
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+    if (cart.length === 0) {
+        Swal.fire('Oops!', 'Cart is empty!', 'warning');
+        return;
     }
 
-    function removeItem(index) {
-        cart.splice(index, 1);
-        renderCart();
-    }
+    const formData = new FormData();
+    formData.append('action', 'checkout');
+    formData.append('cart', JSON.stringify(cart));
+    formData.append('is_member', selectedMember ? 1 : 0);
+    if (selectedMember) formData.append('member_id', selectedMember.id);
 
-    // Member selection
-    document.querySelectorAll('.select-member').forEach(btn => {
-        btn.addEventListener('click', () => {
-            selectedMember = { id: btn.dataset.id, name: btn.dataset.name };
-            renderCart();
-            bootstrap.Modal.getInstance(document.getElementById('memberModal')).hide();
+    fetch("/jetzmotors/admin/functions/checkout.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
             Swal.fire({
+                title: 'Checkout Successful',
+                text: "Print receipt?",
                 icon: 'success',
-                title: 'Member Selected',
-                text: `${selectedMember.name} (Membership ID: ${selectedMember.id})`,
-                timer: 2000,
-                showConfirmButton: false
-            });
-        });
-    });
-
-    // Modal search
-    document.getElementById('memberSearch').addEventListener('keyup', function () {
-        const term = this.value.toLowerCase();
-        document.querySelectorAll('#memberList tr').forEach(row => {
-            const text = row.innerText.toLowerCase();
-            row.style.display = text.includes(term) ? '' : 'none';
-        });
-    });
-
-    // Checkout
-    document.getElementById('checkoutBtn').addEventListener('click', () => {
-        if (cart.length === 0) {
-            Swal.fire('Oops!', 'Cart is empty!', 'warning');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('action', 'checkout');
-        formData.append('cart', JSON.stringify(cart));
-        formData.append('is_member', selectedMember ? 1 : 0);
-        if (selectedMember) formData.append('member_id', selectedMember.id);
-
-        fetch("/jetzmotors/admin/functions/checkout.php", {
-            method: "POST",
-            body: formData
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Checkout Successful',
-                        text: "Would you like to print a receipt?",
-                        icon: 'success',
-                        showCancelButton: true,
-                        confirmButtonText: 'Yes, Print Receipt',
-                        cancelButtonText: 'No, Just Save'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.open("functions/receipt.php?invoice_id=" + data.invoice_id, "_blank");
-                            location.reload();
-                        } else {
-                            location.reload();
-                        }
-                    });
-
-                    cart = [];
-                    selectedMember = null;
-                    renderCart();
+                showCancelButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open("functions/receipt.php?invoice_id=" + data.invoice_id, "_blank");
+                    location.reload();
                 } else {
-                    Swal.fire('Error', data.message, 'error');
+                    location.reload();
                 }
-            })
-            .catch(err => {
-                Swal.fire('Error', err, 'error');
             });
+        } else {
+            Swal.fire('Error', data.message, 'error');
+        }
     });
+});
 </script>
