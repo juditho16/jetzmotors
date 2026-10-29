@@ -1,0 +1,6 @@
+
+# added before Windows reinstall backup
+vendor/
+*.sql
+node_modules/
+.env
